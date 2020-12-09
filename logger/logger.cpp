@@ -11,27 +11,31 @@ Logger::~Logger() {
 
 //open close and clear the log file
 void Logger::clearlogfile() {
-	myFile.open(filename, std::fstream::trunc);
+	try {
+		lock_guard<mutex> lck(m);
+		myFile.open(filename, std::fstream::trunc);
 
-	//close file
-	lock_guard<mutex> lck(m);
-	if (myFile.is_open())
-		myFile.close();
+		//close file
+		if (myFile.is_open())
+			myFile.close();
+	}
+	catch (...) {}
 }
 
 void Logger::log(std::string data) {
-	myFile.open(filename, std::fstream::app);
-	if (!myFile.is_open())
-		return;
+	try {
+		lock_guard<mutex> lck(m);
+		myFile.open(filename, std::fstream::app);
+		if (!myFile.is_open())
+			return;
 
-	std::string myline;
+		std::string myline;
 
-	{		
-			lock_guard<mutex> lck(m);
-			myFile << data;
+		myFile << data;
+
+		//close file
+		if (myFile.is_open())
+			myFile.close();
 	}
-
-	//close file
-	if (myFile.is_open())
-		myFile.close();
+	catch (...) {}
 }

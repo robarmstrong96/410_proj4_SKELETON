@@ -10,7 +10,7 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -pthread
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++11 -pthread
 
 $(TARGET): $(OBJS)
 	$(CC) $(CPPFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS)

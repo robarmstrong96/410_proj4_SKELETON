@@ -12,11 +12,8 @@
 #include "../includes/baker.h"
 #include "../includes/datastructs.h"
 #include "../includes/PRINT.h"
-#include "../includes/logger.h"
 
 using namespace std;
-
-Logger logger;
 
 //*************************************************
 //NOTE:  most of these globals are needed
@@ -94,7 +91,7 @@ int main()
 
 	vector<thread> bakers;
 
-	for (int i = 0; i < 30; i++) {
+	for (int i = 0; i < 5000; i++) {
 		switch(i % 4) {
 			case 0: waiters.push_back(thread(doWaiter, i, "in1.txt")); break;
 			case 1: waiters.push_back(thread(doWaiter, i, "in2.txt")); break;
@@ -103,12 +100,11 @@ int main()
 		}
 	}
 
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 50; i++) {
 		bakers.push_back(thread(doBaker, i)); break;
 	}
 
-	//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	b_WaiterIsFinished = true;
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
 	for (thread & waiter : waiters) {
 		waiter.join();
