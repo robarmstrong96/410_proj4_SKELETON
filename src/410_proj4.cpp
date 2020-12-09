@@ -12,8 +12,11 @@
 #include "../includes/baker.h"
 #include "../includes/datastructs.h"
 #include "../includes/PRINT.h"
+#include "../includes/logger.h"
 
 using namespace std;
+
+Logger logger;
 
 //*************************************************
 //NOTE:  most of these globals are needed
@@ -28,7 +31,7 @@ mutex mutex_order_outQ;
 condition_variable cv_order_inQ;
 
 //when true its time for the baker to quit
-bool b_WaiterIsFinished = false;	
+bool b_WaiterIsFinished = false;
 
 //where orders are stored
 queue<ORDER> order_in_Q;
@@ -75,7 +78,7 @@ void audit_results() {
 		}
 
 		//if one order was screwed up say so
-		if (numDonuts != itOrder->number_donuts) 
+		if (numDonuts != itOrder->number_donuts)
 			PRINT6("ERROR Order", itOrder->order_number, " Expected ", itOrder->number_donuts, " found ", numDonuts);
 	}
 
@@ -86,7 +89,36 @@ void audit_results() {
 
 int main()
 {
-	//TODO your code here
+
+	vector<thread> waiters;
+
+	vector<thread> bakers;
+
+	for (int i = 0; i < 30; i++) {
+		switch(i % 4) {
+			case 0: waiters.push_back(thread(doWaiter, i, "in1.txt")); break;
+			case 1: waiters.push_back(thread(doWaiter, i, "in2.txt")); break;
+			case 2: waiters.push_back(thread(doWaiter, i, "in3.txt")); break;
+			case 3: waiters.push_back(thread(doWaiter, i, "in4.txt")); break;
+		}
+	}
+
+	for (int i = 0; i < 20; i++) {
+		bakers.push_back(thread(doBaker, i)); break;
+	}
+
+	//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	b_WaiterIsFinished = true;
+
+	for (thread & waiter : waiters) {
+		waiter.join();
+	}
+
+	for (thread & baker : bakers) {
+		baker.join();
+	}
+
+	audit_results();
+
 	return SUCCESS;
 }
-
