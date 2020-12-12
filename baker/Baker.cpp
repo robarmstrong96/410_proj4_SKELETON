@@ -4,6 +4,7 @@
 #include "../includes/externs.h"
 #include "../includes/baker.h"
 #include "../includes/PRINT.h"
+#include "../includes/logger.h"
 
 using namespace std;
 

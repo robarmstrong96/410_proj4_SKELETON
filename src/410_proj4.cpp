@@ -12,6 +12,7 @@
 #include "../includes/baker.h"
 #include "../includes/datastructs.h"
 #include "../includes/PRINT.h"
+#include "../includes/logger.h"
 
 using namespace std;
 
@@ -93,11 +94,18 @@ int main()
 
 		vector<thread> bakers;
 
+		vector<thread> mylogger_vect;
+
 		waiters.push_back(thread(doWaiter, 1, "in4.txt"));
 
-		for (int i = 0; i < 24; i++) {
+		for (int i = 0; i < 12; i++) {
 			bakers.push_back(thread(doBaker, i));
 		}
+
+		//for (int i = 0; i < 20; i++) {
+		//	mylogger_vect.push_back(thread(log, i));
+		//}
+		mylogger.log("Fortnite!");
 
 		//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
@@ -108,6 +116,10 @@ int main()
 		for (thread & baker : bakers) {
 			baker.join();
 		}
+
+		//for (thread & log : mylogger_vect) {
+		//	log.join();
+		//}
 
 		audit_results();
 
