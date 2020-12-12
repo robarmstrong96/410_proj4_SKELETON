@@ -86,36 +86,35 @@ void audit_results() {
 
 int main()
 {
+	for (int t = 0; t < 1; t++) {
+		b_WaiterIsFinished = false;
 
-	vector<thread> waiters;
+		vector<thread> waiters;
 
-	vector<thread> bakers;
+		vector<thread> bakers;
 
-	for (int i = 0; i < 8; i++) {
-		switch(i % 4) {
-			case 0: waiters.push_back(thread(doWaiter, i, "in1.txt")); break;
-			case 1: waiters.push_back(thread(doWaiter, i, "in2.txt")); break;
-			case 2: waiters.push_back(thread(doWaiter, i, "in3.txt")); break;
-			case 3: waiters.push_back(thread(doWaiter, i, "in4.txt")); break;
+		waiters.push_back(thread(doWaiter, 1, "in4.txt"));
+
+		for (int i = 0; i < 24; i++) {
+			bakers.push_back(thread(doBaker, i));
 		}
+
+		//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+		for (thread & waiter : waiters) {
+			waiter.join();
+		}
+
+		for (thread & baker : bakers) {
+			baker.join();
+		}
+
+		audit_results();
+
+		waiters.clear();
+		bakers.clear();
+
 	}
-
-	for (int i = 0; i < 24; i++) {
-		//PRINT3("Baker ", i, " Created")
-		bakers.push_back(thread(doBaker, i));
-	}
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-	for (thread & waiter : waiters) {
-		waiter.join();
-	}
-
-	for (thread & baker : bakers) {
-		baker.join();
-	}
-
-	audit_results();
 
 	return SUCCESS;
 }

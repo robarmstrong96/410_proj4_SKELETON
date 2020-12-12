@@ -30,6 +30,8 @@ void Baker::bake_and_box(ORDER &anOrder) {
 
 void Baker::beBaker() {
 	while(!b_WaiterIsFinished || !order_in_Q.empty()) {
+
+		// Bakers wait for notification from conditional
 		{
 			unique_lock<mutex> lck(mutex_order_inQ);
 			while( !b_WaiterIsFinished  || (!b_WaiterIsFinished && order_in_Q.empty()) ) { // Waits for waiter to add items
@@ -39,23 +41,31 @@ void Baker::beBaker() {
 				//PRINT3("Baker ", id, " is back to work!")
 			}
 		}
-		{
-			lock_guard<mutex> lck(mutex_order_inQ);
+
+		ORDER order;
+		bool empty = true;
+
+		{ // Lock for bakers to receive order from order in queue
+		lock_guard<mutex> lck(mutex_order_inQ);
 			if (!order_in_Q.empty()) {
-				ORDER order;
 				{
+					empty = false;
 					order = order_in_Q.front();
 					order_in_Q.pop();
 				}
-
-				//PRINT4("Baker ", id, " is boxing order number ", order.order_number)
-				bake_and_box(order);
-
-				{
-					lock_guard<mutex> lck(mutex_order_outQ);
-					order_out_Vector.push_back(order);
-				}
 			}
+		}
+
+		if (!empty) { // If current thread/baker was able to get an order (non empty queue)
+
+			//PRINT4("Baker ", id, " is boxing order number ", order.order_number)
+			bake_and_box(order);
+
+			{ // Baker has baked and boxed the order and is now adding it to the out queue
+				lock_guard<mutex> lck(mutex_order_outQ);
+				order_out_Vector.push_back(order);
+			}
+
 		}
 	}
 }
