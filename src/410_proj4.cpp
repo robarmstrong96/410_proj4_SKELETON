@@ -91,7 +91,7 @@ int main()
 
 	vector<thread> bakers;
 
-	for (int i = 0; i < 5000; i++) {
+	for (int i = 0; i < 8; i++) {
 		switch(i % 4) {
 			case 0: waiters.push_back(thread(doWaiter, i, "in1.txt")); break;
 			case 1: waiters.push_back(thread(doWaiter, i, "in2.txt")); break;
@@ -100,11 +100,12 @@ int main()
 		}
 	}
 
-	for (int i = 0; i < 50; i++) {
-		bakers.push_back(thread(doBaker, i)); break;
+	for (int i = 0; i < 24; i++) {
+		//PRINT3("Baker ", i, " Created")
+		bakers.push_back(thread(doBaker, i));
 	}
 
-	//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 	for (thread & waiter : waiters) {
 		waiter.join();

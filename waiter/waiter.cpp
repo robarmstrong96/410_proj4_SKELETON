@@ -31,15 +31,14 @@ void Waiter::beWaiter() {
 	int orderStatus = getNext(order); // Set order and get status of order.
 
 	while(orderStatus == SUCCESS) {
-		//PRINT5("Waiter ",id,": ","Order Status -> ", orderStatus)
 		unique_lock<mutex> lck(mutex_order_inQ);
 		order_in_Q.push(order); // 1) add order to queue
-		//PRINT5("Waiter ",id,": ","Added Order ", order.order_number)
+		//PRINT4("Waiter ", id, " is pushing order number ", order.order_number)
 		orderStatus = getNext(order); // 3) get the next order
 		cv_order_inQ.notify_all(); // 2) notify all listening/sleeping threads
 	}
 	unique_lock<mutex> lck(mutex_order_inQ);
 	b_WaiterIsFinished = true; // No more orders, waiter is done. Set extern global to true.
+	//PRINT4("Waiter ", id, " is finished: ", b_WaiterIsFinished)
 	cv_order_inQ.notify_all(); // 2) notify all listening/sleeping threads
-	//PRINT4("Waiter ",id,": ","Finished!")
 }
